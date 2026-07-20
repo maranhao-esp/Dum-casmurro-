@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Dom Casmurro — Os Olhos de Ressaca</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --ink:#12181c; --ink-2:#1a2329;
+  --paper:#ede4cc; --paper-dim:#d9cfae;
+  --tide:#3e6b64; --tide-light:#6fa89f; --tide-deep:#254a44;
+  --wine:#6b2737; --wine-light:#a34456; --wine-deep:#4a1a26;
+  --gold:#c9a227; --ash:#8a8578;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%; background:var(--ink); color:var(--paper); font-family:'Lora',serif; overflow-x:hidden;}
+body{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px 14px;}
+.tide-bg{position:fixed; inset:0; z-index:0; pointer-events:none; transition:background 1.2s ease;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(62,107,100,0.16), transparent 60%),
+             radial-gradient(ellipse 60% 50% at 80% 100%, rgba(107,39,55,0.10), transparent 60%);}
+.stage{position:relative; z-index:1; width:100%; max-width:640px;}
+.chapter-mark{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; font-family:'Inter',sans-serif;
+  letter-spacing:0.14em; text-transform:uppercase; font-size:11px; color:var(--gold); opacity:0; animation:fadeUp .7s ease forwards;}
+.chapter-mark::before{content:''; display:block; width:22px; height:1px; background:var(--gold); opacity:.6;}
+.panel{background:linear-gradient(180deg, var(--paper) 0%, var(--paper-dim) 100%); color:var(--ink); border-radius:2px;
+  padding:32px 26px 26px; box-shadow:0 30px 60px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.05); opacity:0; animation:fadeUp .8s ease forwards .1s;}
+h1.title{font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(21px,5.5vw,27px); line-height:1.18; margin-bottom:14px;}
+p.narrative{font-size:15.5px; line-height:1.68; color:#2a2620; margin-bottom:13px;}
+p.narrative:last-of-type{margin-bottom:0;}
+p.narrative i{color:var(--wine); font-style:italic;}
+.divider{width:100%; height:30px; margin:18px 0 4px;}
+.btn{font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px; padding:14px 26px; border-radius:2px;
+  border:1px solid var(--gold); background:transparent; color:var(--gold); cursor:pointer; letter-spacing:.03em; transition:all .25s ease;}
+.btn:hover{background:var(--gold); color:var(--ink);}
+.btn:disabled{opacity:.35; cursor:not-allowed;}
+.btn-block{display:block; width:100%; margin-top:8px;}
+.center{text-align:center;}
+.eyebrow{font-family:'Inter',sans-serif; letter-spacing:.2em; text-transform:uppercase; font-size:11px; color:var(--tide-light); margin-bottom:10px;}
+h1.hero{font-family:'Playfair Display',serif; font-style:italic; font-weight:700; font-size:clamp(32px,8vw,50px); color:var(--paper); margin-bottom:8px;}
+.sub{font-family:'Lora',serif; font-size:14.5px; color:var(--ash); max-width:400px; margin:0 auto; line-height:1.6;}
+.role-row{display:flex; gap:12px; margin-top:28px; justify-content:center; flex-wrap:wrap;}
+.role-card{font-family:'Inter',sans-serif; background:var(--ink-2); border:1px solid rgba(237,228,204,.15); border-radius:3px;
+  padding:22px 20px; width:220px; cursor:pointer; transition:all .25s ease; text-align:left;}
+.role-card:hover{border-color:var(--gold); transform:translateY(-2px);}
+.role-card .rc-title{font-weight:700; font-size:15px; color:var(--paper); margin-bottom:6px;}
+.role-card .rc-desc{font-size:12.5px; color:var(--ash); line-height:1.5;}
+input.field{font-family:'Inter',sans-serif; font-size:16px; padding:14px 16px; border-radius:2px; border:1px solid rgba(237,228,204,.25);
+  background:var(--ink-2); color:var(--paper); width:100%; margin-top:14px; letter-spacing:.05em;}
+input.field:focus{outline:none; border-color:var(--gold);}
+.code-display{font-family:'Playfair Display',serif; font-weight:700; font-size:56px; letter-spacing:.08em; color:var(--gold);
+  margin:18px 0; text-align:center;}
+.player-count{font-family:'Inter',sans-serif; font-size:12.5px; color:var(--tide-light); text-align:center; margin-top:6px;}
+.vote-split{display:flex; flex-direction:column; gap:12px; min-height:280px;}
+.vote-block{flex:1; border-radius:4px; padding:26px 20px; cursor:pointer; display:flex; flex-direction:column; justify-content:center;
+  transition:transform .15s ease, filter .15s ease; font-family:'Inter',sans-serif; text-align:center;}
+.vote-block:active{transform:scale(.97);}
+.vote-block.tide{background:linear-gradient(135deg, var(--tide), var(--tide-deep)); color:var(--paper);}
+.vote-block.wine{background:linear-gradient(135deg, var(--wine), var(--wine-deep)); color:var(--paper);}
+.vote-block .vb-label{font-size:11px; letter-spacing:.16em; text-transform:uppercase; opacity:.7; margin-bottom:8px;}
+.vote-block .vb-text{font-family:'Playfair Display',serif; font-size:19px; font-weight:600; line-height:1.35;}
+.bar-row{margin:16px 0; font-family:'Inter',sans-serif;}
+.bar-label{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px; color:#2a2620;}
+.bar-track{height:14px; background:rgba(18,24,28,.08); border-radius:8px; overflow:hidden;}
+.bar-fill{height:100%; border-radius:8px; transition:width .4s ease;}
+.bar-fill.tide{background:var(--tide);}
+.bar-fill.wine{background:var(--wine);}
+.waiting-pulse{width:14px; height:14px; border-radius:50%; background:var(--tide-light); margin:20px auto; animation:pulse 1.4s ease-in-out infinite;}
+.restart-btn{font-family:'Inter',sans-serif; font-size:13px; font-weight:500; color:var(--ash); background:none; border:none;
+  border-bottom:1px solid var(--ash); cursor:pointer; margin-top:22px; padding-bottom:2px;}
+.restart-btn:hover{color:var(--paper); border-color:var(--paper);}
+.tag{font-family:'Inter',sans-serif; letter-spacing:.1em; text-transform:uppercase; font-size:11px; color:var(--wine); margin-bottom:10px; display:block;}
+.error-msg{font-family:'Inter',sans-serif; font-size:13px; color:var(--wine-light); margin-top:10px; text-align:center;}
+.config-warning{font-family:'Inter',sans-serif; font-size:13px; color:var(--wine-light); text-align:center; max-width:420px; line-height:1.6; padding:0 10px;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:.3; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);}}
+@media (max-width:420px){.panel{padding:24px 18px 20px;} .code-display{font-size:44px;}}
+</style>
+</head>
+<body>
+<div class="tide-bg" id="tideBg"></div>
+<div class="stage" id="stage">
+  <div class="center">
+    <div class="eyebrow">Carregando</div>
+    <div class="waiting-pulse"></div>
+  </div>
+</div>
+
+<script type="module">
+/* =========================================================================
+   1) CONFIGURAÇÃO DO FIREBASE
+   Cole aqui o objeto firebaseConfig do seu projeto (Console do Firebase >
+   Configurações do projeto > Seus apps > SDK do Firebase).
+   ========================================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyA_t7XCOYJ3chVhslY62H26JXxkLt6MILY",
+  authDomain: "dom-casmurro-595de.firebaseapp.com",
+  databaseURL: "https://dom-casmurro-595de-default-rtdb.firebaseio.com",
+  projectId: "dom-casmurro-595de",
+  storageBucket: "dom-casmurro-595de.firebasestorage.app",
+  messagingSenderId: "383747124014",
+  appId: "1:383747124014:web:e50d4afa374400de15a8bf",
+  measurementId: "G-H8ZPHT7CMS"
+};
+
+/* Regras do Realtime Database necessárias (Console > Realtime Database > Regras) —
+   liberadas para o teste em sala de aula, sem autenticação:
+
+   {
+     "rules": {
+       ".read": true,
+       ".write": true
+     }
+   }
+*/
+
+let db = null;
+let ref, set, get, onValue, off;
+let firebaseReady = firebaseConfig.apiKey !== "COLE_AQUI";
+
+/* =========================================================================
+   2) CONTEÚDO DA HISTÓRIA
+   ========================================================================= */
+const chapters = {
+  c1:{
+    label:'Capítulo I', title:'A Promessa',
+    text:[
+      'Sua mãe fez um voto antes mesmo de você nascer: se o filho vivesse, seria padre. Anos depois, ela lembra a promessa — e você sente o peso de uma vida decidida por outra pessoa, antes mesmo de você existir.',
+      'José Dias, o agregado da casa, sussurra que talvez haja um jeito de escapar do destino.'
+    ],
+    optA:{short:'Aceitar o destino', side:'tide'},
+    optB:{short:'Escapar do destino', side:'wine'},
+    scored:false, next:'c2'
+  },
+  c2:{
+    label:'Capítulo II', title:'O Pedido',
+    text:[
+      'Capitu já deixou claro, num olhar, o que sente. Agora é sua vez de agir. Você pode ir até ela e falar diretamente — ou pedir que José Dias, sempre tão hábil com palavras, intermedeie por você.',
+      'A forma como você começa essa história talvez diga algo sobre como você vai conduzi-la.'
+    ],
+    optA:{short:'Falar diretamente com Capitu', side:'tide'},
+    optB:{short:'Pedir a José Dias que intermedeie', side:'wine'},
+    scored:false, next:'c3'
+  },
+  c3:{
+    label:'Capítulo III', title:'Os Olhos de Ressaca',
+    text:[
+      'Anos depois, já casado com Capitu, você repara em algo: o jeito como ela olha para Escobar, seu melhor amigo. Um olhar que parece <i>puxar para dentro, como a ressaca do mar puxa o barco para o largo</i>.',
+      'Pode ser nada. Pode ser tudo. A dúvida chegou — e agora é sua.'
+    ],
+    optA:{short:'Perguntar abertamente o que aquele olhar significa', side:'tide'},
+    optB:{short:'Guardar silêncio e ficar apenas observando', side:'wine'},
+    scored:true, next:'c4'
+  },
+  c4:{
+    label:'Capítulo IV', title:'A Amizade com Escobar',
+    text:[
+      'Escobar continua por perto — jantares, visitas, conversas até tarde. Ele é seu melhor amigo desde o seminário. Mas agora cada visita vem com um desconforto que você não sabe nomear.',
+      'Você poderia manter tudo como sempre foi. Ou arranjar, aos poucos, desculpas para vê-lo menos.'
+    ],
+    optA:{short:'Manter a amizade como sempre foi', side:'tide'},
+    optB:{short:'Arranjar desculpas para afastá-lo', side:'wine'},
+    scored:true, next:'c5'
+  },
+  c5:{
+    label:'Capítulo V', title:'A Viagem',
+    text:[
+      'Escobar propõe uma viagem — ele, a esposa, você e Capitu, juntos. Dias inteiros na companhia um do outro, sem a rotina da cidade para preencher os silêncios.',
+      'Aceitar pode aproximar os quatro ainda mais. Recusar, sob algum pretexto, pode ser mais confortável — ou pode ser o primeiro tijolo de um muro.'
+    ],
+    optA:{short:'Aceitar viajar todos juntos', side:'tide'},
+    optB:{short:'Recusar com um pretexto qualquer', side:'wine'},
+    scored:false, next:'c6'
+  },
+  c6:{
+    label:'Capítulo VI', title:'O Enterro de Escobar',
+    text:[
+      'Escobar morre afogado, tentando salvar um nadador em apuros. No velório, você observa Capitu diante do caixão — o rosto pálido, os olhos fixos, o corpo imóvel por tempo demais.',
+      'É luto. Ou é alguma coisa maior, que ela não pode dizer diante de ninguém. Você decide como vai ler aquele silêncio.'
+    ],
+    optA:{short:'Ler aquilo como luto natural', side:'tide'},
+    optB:{short:'Ler aquilo como prova do que temia', side:'wine'},
+    scored:true, next:'c7'
+  },
+  c7:{
+    label:'Capítulo VII', title:'O Espelho',
+    text:[
+      'Ezequiel cresce. Ele ri como Escobar ria. Anda como Escobar andava. Você se pega diante do espelho, comparando o rosto do menino com uma fotografia antiga do amigo morto.',
+      'Você pode continuar procurando semelhanças. Ou guardar a fotografia e tentar apenas viver.'
+    ],
+    optA:{short:'Parar de procurar semelhanças', side:'tide'},
+    optB:{short:'Continuar comparando cada traço', side:'wine'},
+    scored:true, next:'c8'
+  },
+  c8:{
+    label:'Capítulo VIII', title:'Ezequiel',
+    text:[
+      'Chegou o momento em que a dúvida não pode mais ser adiada. Diante de você está Ezequiel — seu filho, ou a prova viva de uma traição nunca confirmada.',
+      'É a última escolha. Depois dela, não há mais capítulos para adiar a resposta.'
+    ],
+    optA:{short:'Confiar em Capitu, apesar de tudo', side:'tide'},
+    optB:{short:'Deixar o ciúme decidir de vez', side:'wine'},
+    scored:true, next:'ending'
+  }
+};
+
+const endings = {
+  paz:{ tag:'Final — Paz Verdadeira', title:'A Casa Sem Sombras',
+    text:['Vocês perguntaram quando tiveram dúvida, e escolheram confiar mais vezes do que desconfiar. As perguntas não desapareceram — mas aprenderam a fazê-las juntos, em vez de em silêncio.',
+      'Capitu e Bentinho envelhecem na mesma casa, sem o muro que separa o narrador do resto do mundo no livro original. Ezequiel cresce sendo apenas Ezequiel — filho, não prova de nada.'],
+    wave:['#3e6b64','#6fa89f',false] },
+  fragil:{ tag:'Final — Paz Frágil', title:'A Ressaca Que Passou',
+    text:['A turma hesitou mais de uma vez, deixou a dúvida crescer em silêncio — mas, no fim, a confiança venceu por pouco.',
+      'É uma paz real, mas construída sobre coisas que nunca foram ditas em voz alta. Capitu talvez nunca saiba de tudo o que foi guardado.'],
+    wave:['#3e6b64','#c9a227',false] },
+  ambiguo:{ tag:'Final — Ambíguo', title:'A Pergunta Que Ficou',
+    text:['Houve coragem em alguns momentos — perguntas feitas, amizades mantidas — mas quando a dúvida voltou, mais forte, o ciúme venceu por pouco.',
+      'A vida continua sob o mesmo teto, mas algo mudou de um jeito que ninguém nomeia. Como no livro, a resposta certa nunca chega.'],
+    wave:['#6b2737','#a34456',true] },
+  casmurro:{ tag:'Final — Dom Casmurro', title:'A Casa Isolada de Engenho Novo',
+    text:['A dúvida foi guardada em silêncio, e o ciúme decidiu quase tudo. Como no livro, a suspeita nunca chega a ser prova — mas isso não impede que ela destrua tudo em volta.',
+      'Anos depois, sozinho, o narrador escreve estas mesmas páginas tentando entender o que aconteceu, sem nunca saber se a história que conta é a que realmente aconteceu, ou só a que o ciúme deixou lembrar.'],
+    wave:['#6b2737','#a34456',true] }
+};
+const SCORED_TOTAL = Object.values(chapters).filter(c=>c.scored).length; // 5
+
+function computeEnding(tide,wine){
+  if(tide>=4) return 'paz';
+  if(wine>=4) return 'casmurro';
+  if(tide===3) return 'fragil';
+  return 'ambiguo';
+}
+
+/* =========================================================================
+   3) HELPERS DE INTERFACE
+   ========================================================================= */
+const stageEl = document.getElementById('stage');
+function render(html){ stageEl.innerHTML = html; }
+function esc(s){ return (s||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function roomCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s=''; for(let i=0;i<4;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function tideWave(color1,color2,turbulent){
+  const dur = turbulent?'2.4s':'4.2s';
+  return `<svg class="divider" viewBox="0 0 300 34" preserveAspectRatio="none">
+    <path fill="${color1}" opacity="0.5"><animate attributeName="d" dur="${dur}" repeatCount="indefinite"
+      values="M0,17 Q75,${turbulent?4:10} 150,17 T300,17 V34 H0 Z; M0,17 Q75,${turbulent?30:24} 150,17 T300,17 V34 H0 Z; M0,17 Q75,${turbulent?4:10} 150,17 T300,17 V34 H0 Z"/></path>
+    <path fill="${color2}" opacity="0.35"><animate attributeName="d" dur="${turbulent?'3s':'5.5s'}" repeatCount="indefinite"
+      values="M0,20 Q75,${turbulent?30:26} 150,20 T300,20 V34 H0 Z; M0,20 Q75,${turbulent?6:14} 150,20 T300,20 V34 H0 Z; M0,20 Q75,${turbulent?30:26} 150,20 T300,20 V34 H0 Z"/></path>
+  </svg>`;
+}
+function setAmbient(side){
+  const bg=document.getElementById('tideBg');
+  if(side==='wine') bg.style.background='radial-gradient(ellipse 80% 60% at 50% 0%, rgba(107,39,55,0.20), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 100%, rgba(107,39,55,0.14), transparent 60%)';
+  else if(side==='tide') bg.style.background='radial-gradient(ellipse 80% 60% at 50% 0%, rgba(62,107,100,0.20), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 100%, rgba(62,107,100,0.14), transparent 60%)';
+}
+function renderEnding(endId){
+  const e = endings[endId];
+  setAmbient(endId==='casmurro'||endId==='ambiguo' ? 'wine' : 'tide');
+  render(`
+    <div class="chapter-mark">Capítulo Final — Desfecho</div>
+    <div class="panel">
+      <span class="tag">${e.tag}</span>
+      <h1 class="title">${e.title}</h1>
+      ${e.text.map(p=>`<p class="narrative">${p}</p>`).join('')}
+      ${tideWave(e.wave[0],e.wave[1],e.wave[2])}
+      <button class="restart-btn" onclick="window.appGoLanding()">Voltar ao início</button>
+    </div>
+  `);
+}
+
+/* =========================================================================
+   4) CAMADA DE DADOS (Firestore)
+   Estrutura:
+   salas/{codigo}                          -> { capitulo, revelado, finalId }
+   salas/{codigo}/participantes/{jogadorId}-> { nome }
+   salas/{codigo}/votos/{capitulo_jogador} -> { capitulo, escolha, jogadorId }
+   ========================================================================= */
+const Data = {
+  async criarSala(codigo){
+    await set(ref(db, `salas/${codigo}`), { capitulo:'lobby', revelado:false, finalId:null });
+  },
+  async salaExiste(codigo){
+    const snap = await get(ref(db, `salas/${codigo}`));
+    return snap.exists();
+  },
+  async definirEstado(codigo, capitulo, revelado, finalId=null){
+    await set(ref(db, `salas/${codigo}`), { capitulo, revelado, finalId });
+  },
+  ouvirEstado(codigo, cb){
+    const r = ref(db, `salas/${codigo}`);
+    const handler = snap => { if(snap.exists()) cb(snap.val()); };
+    onValue(r, handler);
+    return () => off(r, 'value', handler);
+  },
+  async entrarComoParticipante(codigo, jogadorId, nome){
+    await set(ref(db, `salas/${codigo}/participantes/${jogadorId}`), nome);
+  },
+  ouvirParticipantes(codigo, cb){
+    const r = ref(db, `salas/${codigo}/participantes`);
+    const handler = snap => cb(snap.exists() ? Object.keys(snap.val()).length : 0);
+    onValue(r, handler);
+    return () => off(r, 'value', handler);
+  },
+  async votar(codigo, capitulo, jogadorId, escolha){
+    await set(ref(db, `salas/${codigo}/votos/${capitulo}/${jogadorId}`), escolha);
+  },
+  ouvirVotos(codigo, capitulo, cb){
+    const r = ref(db, `salas/${codigo}/votos/${capitulo}`);
+    const handler = snap => {
+      let a=0,b=0;
+      snap.forEach(child => { const v = child.val(); if(v==='A') a++; else if(v==='B') b++; });
+      cb(a,b);
+    };
+    onValue(r, handler);
+    return () => off(r, 'value', handler);
+  }
+};
+
+/* =========================================================================
+   5) ESTADO DO APP + NAVEGAÇÃO
+   ========================================================================= */
+let room=null, playerId=uid(), myVoteChapter=null;
+let hostScore={tide:0,wine:0};
+let unsubList=[];
+function clearListeners(){ unsubList.forEach(u=>{ try{u();}catch(e){} }); unsubList=[]; }
+
+function goLanding(){
+  clearListeners(); room=null; myVoteChapter=null; hostScore={tide:0,wine:0};
+
+  if(!firebaseReady){
+    render(`
+      <div class="center">
+        <div class="eyebrow">Configuração pendente</div>
+        <h1 class="hero" style="font-size:26px;">Falta a config do Firebase</h1>
+        <p class="config-warning">Abra o arquivo, encontre o bloco <b>firebaseConfig</b> no topo do &lt;script&gt;, e cole as credenciais do seu projeto (Console do Firebase → Configurações do projeto → SDK do Firebase). Também confira se as regras do Firestore estão liberadas — o comentário logo abaixo do config traz o texto pronto.</p>
+      </div>
+    `);
+    return;
+  }
+
+  render(`
+    <div class="center">
+      <div class="eyebrow">Uma narrativa com escolhas</div>
+      <h1 class="hero">Dom Casmurro</h1>
+      <p class="sub">Reviva a história de Bentinho e Capitu em grupo. Uma pessoa projeta a narrativa; o resto da turma vota pelo celular, como num Kahoot.</p>
+      <div class="role-row">
+        <div class="role-card" onclick="window.appHostSetup()">
+          <div class="rc-title">Sou o apresentador</div>
+          <div class="rc-desc">Projeto a história e crio uma sala com um código para a turma entrar.</div>
+        </div>
+        <div class="role-card" onclick="window.appPlayerSetup()">
+          <div class="rc-title">Sou participante</div>
+          <div class="rc-desc">Entro com o código da sala e voto nas escolhas pelo celular.</div>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+/* ---------------- HOST ---------------- */
+async function hostSetup(){
+  room = roomCode();
+  await Data.criarSala(room);
+  render(`
+    <div class="center">
+      <div class="eyebrow">Modo apresentador</div>
+      <h1 class="hero" style="font-size:26px;">Sala criada</h1>
+      <p class="sub">Peça para a turma acessar este mesmo link, escolher "Sou participante" e digitar o código abaixo.</p>
+      <div class="code-display">${room}</div>
+      <div class="player-count" id="pCount">0 participantes conectados</div>
+      <button class="btn btn-block" onclick="window.appHostStart()">Iniciar a história</button>
+    </div>
+  `);
+  const unsub = Data.ouvirParticipantes(room, n=>{
+    const el = document.getElementById('pCount');
+    if(el) el.textContent = `${n} participante${n===1?'':'s'} conectado${n===1?'':'s'}`;
+  });
+  unsubList.push(unsub);
+}
+
+function hostStart(){ hostShowChapter('c1'); }
+
+async function hostShowChapter(chId){
+  clearListeners();
+  const ch = chapters[chId];
+  await Data.definirEstado(room, chId, false);
+  render(`
+    <div class="chapter-mark">${ch.label} — ${ch.title}</div>
+    <div class="panel">
+      <h1 class="title">${ch.title}</h1>
+      ${ch.text.map(p=>`<p class="narrative">${p}</p>`).join('')}
+      ${tideWave('#3e6b64','#6fa89f',false)}
+      <p style="font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ash); margin-top:16px;">Narre este trecho em voz alta. Quando estiver pronto, libere a votação.</p>
+      <button class="btn btn-block" onclick="window.appHostReveal('${chId}')">Liberar votação no celular da turma</button>
+    </div>
+  `);
+}
+
+async function hostReveal(chId){
+  clearListeners();
+  const ch = chapters[chId];
+  await Data.definirEstado(room, chId, true);
+  let lastA=0, lastB=0;
+  function draw(){
+    const total = lastA+lastB || 1;
+    const pctA = Math.round(lastA/total*100), pctB = 100-pctA;
+    render(`
+      <div class="chapter-mark">${ch.label} — votação aberta</div>
+      <div class="panel">
+        <h1 class="title" style="font-size:19px;">A turma está votando...</h1>
+        <div class="bar-row">
+          <div class="bar-label"><span>${esc(ch.optA.short)}</span><span>${lastA} voto${lastA===1?'':'s'}</span></div>
+          <div class="bar-track"><div class="bar-fill tide" style="width:${pctA}%"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>${esc(ch.optB.short)}</span><span>${lastB} voto${lastB===1?'':'s'}</span></div>
+          <div class="bar-track"><div class="bar-fill wine" style="width:${pctB}%"></div></div>
+        </div>
+        <button class="btn btn-block" onclick="window.appHostAdvance('${chId}')">Encerrar votação e avançar</button>
+      </div>
+    `);
+  }
+  draw();
+  const unsub = Data.ouvirVotos(room, chId, (a,b)=>{ lastA=a; lastB=b; draw(); });
+  unsubList.push(unsub);
+}
+
+async function hostAdvance(chId){
+  clearListeners();
+  const ch = chapters[chId];
+  const winnerSide = hostLastA_ >= hostLastB_ ? ch.optA.side : ch.optB.side; // fallback set below
+  if(ch.scored){ hostScore[winnerSide] = (hostScore[winnerSide]||0)+1; }
+  if(ch.next==='ending'){
+    const endId = computeEnding(hostScore.tide||0, hostScore.wine||0);
+    await Data.definirEstado(room, 'ending', true, endId);
+    renderEnding(endId);
+  } else {
+    hostShowChapter(ch.next);
+  }
+}
+// track latest vote counts globally so hostAdvance can read them
+let hostLastA_=0, hostLastB_=0;
+
+/* ---------------- PLAYER ---------------- */
+function playerSetup(){
+  render(`
+    <div class="center">
+      <div class="eyebrow">Modo participante</div>
+      <h1 class="hero" style="font-size:28px;">Entrar na sala</h1>
+      <p class="sub">Peça o código de 4 letras para quem está projetando a história.</p>
+      <input class="field" id="codeInput" placeholder="CÓDIGO DA SALA" maxlength="4" style="text-align:center; letter-spacing:.2em; text-transform:uppercase;">
+      <input class="field" id="nameInput" placeholder="Seu nome ou apelido" maxlength="20">
+      <button class="btn btn-block" onclick="window.appPlayerJoin()">Entrar</button>
+      <div class="error-msg" id="joinErr"></div>
+    </div>
+  `);
+}
+
+async function playerJoin(){
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const name = document.getElementById('nameInput').value.trim() || 'Sem nome';
+  if(code.length!==4){ document.getElementById('joinErr').textContent='Digite o código de 4 letras.'; return; }
+  const exists = await Data.salaExiste(code);
+  if(!exists){ document.getElementById('joinErr').textContent='Sala não encontrada. Confira o código.'; return; }
+  room = code;
+  await Data.entrarComoParticipante(room, playerId, name);
+  const unsub = Data.ouvirEstado(room, s=>playerHandleState(s));
+  unsubList.push(unsub);
+}
+
+function playerWaiting(msg){
+  render(`
+    <div class="center">
+      <div class="eyebrow">Sala ${room}</div>
+      <h1 class="hero" style="font-size:24px;">Você entrou!</h1>
+      <p class="sub">${msg || 'Aguardando o apresentador iniciar a história...'}</p>
+      <div class="waiting-pulse"></div>
+    </div>
+  `);
+}
+
+let playerVoteUnsub=null;
+function playerHandleState(s){
+  if(s.capitulo==='lobby'){ myVoteChapter=null; playerWaiting(); return; }
+
+  if(s.capitulo==='ending'){
+    clearListeners();
+    renderEnding(s.finalId);
+    return;
+  }
+
+  const ch = chapters[s.capitulo];
+  if(!s.revelado){
+    if(myVoteChapter!==s.capitulo) myVoteChapter=null;
+    playerWaiting(`Capítulo em andamento: "${ch.title}". Aguarde a votação abrir.`);
+    return;
+  }
+  if(myVoteChapter===s.capitulo){
+    render(`
+      <div class="chapter-mark">${ch.label} — voto registrado</div>
+      <div class="center">
+        <p class="sub">Seu voto foi registrado. Aguardando o restante da turma...</p>
+        <div class="waiting-pulse"></div>
+      </div>
+    `);
+    return;
+  }
+  render(`
+    <div class="chapter-mark">${ch.label} — vote agora</div>
+    <div class="vote-split">
+      <div class="vote-block tide" onclick="window.appPlayerVote('${s.capitulo}','A')">
+        <div class="vb-label">Opção A</div>
+        <div class="vb-text">${esc(ch.optA.short)}</div>
+      </div>
+      <div class="vote-block wine" onclick="window.appPlayerVote('${s.capitulo}','B')">
+        <div class="vb-label">Opção B</div>
+        <div class="vb-text">${esc(ch.optB.short)}</div>
+      </div>
+    </div>
+  `);
+}
+
+async function playerVote(chId,choice){
+  myVoteChapter = chId;
+  await Data.votar(room, chId, playerId, choice);
+  const raw = await get(ref(db, `salas/${room}`));
+  if(raw.exists()) playerHandleState(raw.val());
+}
+
+/* patch hostAdvance to read live counts correctly */
+const _origOuvirVotos = Data.ouvirVotos.bind(Data);
+Data.ouvirVotos = (codigo, capitulo, cb) => _origOuvirVotos(codigo, capitulo, (a,b)=>{ hostLastA_=a; hostLastB_=b; cb(a,b); });
+
+async function boot(){
+  if(!firebaseReady){ goLanding(); return; }
+  try{
+    const timeout = (ms) => new Promise((_,rej)=>setTimeout(()=>rej(new Error('Tempo esgotado ao conectar no Firebase.')), ms));
+    const loadModules = (async () => {
+      const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const dbMod  = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+      return { appMod, dbMod };
+    })();
+    const { appMod, dbMod } = await Promise.race([loadModules, timeout(8000)]);
+    ref = dbMod.ref; set = dbMod.set; get = dbMod.get; onValue = dbMod.onValue; off = dbMod.off;
+    const app = appMod.initializeApp(firebaseConfig);
+    db = dbMod.getDatabase(app);
+    goLanding();
+  }catch(err){
+    render(`
+      <div class="center">
+        <div class="eyebrow">Erro ao conectar</div>
+        <h1 class="hero" style="font-size:22px;">Não deu pra carregar o Firebase</h1>
+        <p class="config-warning"><b>Detalhe técnico:</b> ${esc(err.message || String(err))}</p>
+        <p class="config-warning" style="margin-top:12px;">Isso costuma acontecer quando o arquivo é aberto dentro do visualizador do próprio Claude, que bloqueia a conexão externa. Baixe o arquivo (ícone de download) e abra ele direto no Chrome do celular — fora do app do Claude — pra funcionar.</p>
+        <button class="btn btn-block" style="max-width:260px; margin:20px auto 0;" onclick="window.appBoot()">Tentar de novo</button>
+      </div>
+    `);
+  }
+}
+window.appBoot = boot;
+
+/* =========================================================================
+   6) EXPOSIÇÃO GLOBAL (para os onclick inline) + BOOT
+   ========================================================================= */
+window.appGoLanding = goLanding;
+window.appHostSetup = hostSetup;
+window.appHostStart = hostStart;
+window.appHostReveal = hostReveal;
+window.appHostAdvance = hostAdvance;
+window.appPlayerSetup = playerSetup;
+window.appPlayerJoin = playerJoin;
+window.appPlayerVote = playerVote;
+
+boot();
+</script>
+</body>
+</html>
